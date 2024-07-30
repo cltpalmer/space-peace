@@ -7,6 +7,9 @@ playerImage.src = 'https://i.imgur.com/NxDmSPB.png'; // Updated URL for the host
 const winningImage = new Image();
 winningImage.src = 'https://i.imgur.com/MjSvts8.png'; // Winning image URL
 
+const losingImage = new Image();
+losingImage.src = 'https://i.imgur.com/yOHGZ9w.png'; // Losing image URL
+
 const player = {
     x: canvas.width / 2 - 37.5,
     y: canvas.height - 150,
@@ -18,6 +21,7 @@ const player = {
 let obstacles = [];
 let score = 0;
 let gameOver = true;
+let gameWon = false; // Track game won state
 let obstacleSpeed = 2; // Base speed of obstacles
 let risingBarHeight = 0;
 let barSpeed = 0.1; // Initial speed of the rising bar
@@ -123,9 +127,11 @@ function draw() {
         updateObstacles();
         checkWin();
     } else {
-        context.fillStyle = '#fff';
-        context.font = '30px Arial';
-        context.fillText('Game Over', canvas.width / 2 - 70, canvas.height / 2);
+        if (gameWon) {
+            context.drawImage(winningImage, canvas.width / 2 - 150, canvas.height / 2 - 150, 300, 300);
+        } else {
+            context.drawImage(losingImage, canvas.width / 2 - 150, canvas.height / 2 - 150, 300, 300);
+        }
     }
 
     context.fillStyle = '#fff';
@@ -138,6 +144,7 @@ function draw() {
 
 function startGame() {
     gameOver = false;
+    gameWon = false; // Reset game won state
     score = 0;
     player.lives = 3;
     obstacles = [];
@@ -158,16 +165,11 @@ function startGame() {
 
 function endGame(won) {
     gameOver = true;
+    gameWon = won; // Set game won state
     clearInterval(obstacleInterval);
     clearInterval(speedInterval);
     clearInterval(barSpeedInterval);
-    if (won) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(winningImage, canvas.width / 2 - 150, canvas.height / 2 - 150, 300, 300);
-        document.getElementById('playAgainButton').style.display = 'block';
-    } else {
-        document.getElementById('startButton').style.display = 'block'; // Show the start button on game over
-    }
+    document.getElementById('playAgainButton').style.display = 'block'; // Show play again button
 }
 
 canvas.addEventListener('mousemove', (event) => {

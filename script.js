@@ -4,6 +4,9 @@ const context = canvas.getContext('2d');
 const playerImage = new Image();
 playerImage.src = 'https://i.imgur.com/NxDmSPB.png'; // Updated URL for the hosted image
 
+const winningImage = new Image();
+winningImage.src = 'https://i.imgur.com/MjSvts8.png'; // Winning image URL
+
 const player = {
     x: canvas.width / 2 - 37.5,
     y: canvas.height - 150,
@@ -18,6 +21,10 @@ let gameOver = true;
 let obstacleSpeed = 2; // Base speed of obstacles
 let risingBarHeight = 0;
 let barSpeed = 0.1; // Initial speed of the rising bar
+
+let obstacleInterval;
+let speedInterval;
+let barSpeedInterval;
 
 function createObstacle() {
     const size = Math.random() * 30 + 20;
@@ -63,11 +70,7 @@ function updateObstacles() {
             obstacles.shift();
 
             if (player.lives === 0) {
-                gameOver = true;
-                document.getElementById('startButton').style.display = 'block'; // Show the start button on game over
-                clearInterval(obstacleInterval);
-                clearInterval(speedInterval);
-                clearInterval(barSpeedInterval);
+                endGame(false);
             }
         }
     });
@@ -95,12 +98,21 @@ function drawRisingBar() {
     context.fillRect(0, canvas.height - risingBarHeight, canvas.width, risingBarHeight);
     risingBarHeight += barSpeed;
 
-    if (risingBarHeight > canvas.height) {
-        gameOver = true;
-        document.getElementById('startButton').style.display = 'block'; // Show the start button on game over
-        clearInterval(obstacleInterval);
-        clearInterval(speedInterval);
-        clearInterval(barSpeedInterval);
+    if (risingBarHeight > canvas.height - player.height) {
+        if (player.y + player.height > canvas.height - risingBarHeight) {
+            player.lives--;
+            risingBarHeight = 0; // Reset bar height on losing a life
+
+            if (player.lives === 0) {
+                endGame(false);
+            }
+        }
+    }
+}
+
+function checkWin() {
+    if (player.y < risingBarHeight) {
+        endGame(true);
     }
 }
 
@@ -112,6 +124,7 @@ function draw() {
         drawObstacles();
         drawRisingBar();
         updateObstacles();
+        checkWin();
     } else {
         context.fillStyle = '#fff';
         context.font = '30px Arial';
@@ -135,6 +148,7 @@ function startGame() {
     risingBarHeight = 0;
     barSpeed = 0.1;
     document.getElementById('startButton').style.display = 'none'; // Hide the start button when game starts
+    document.getElementById('playAgainButton').style.display = 'none'; // Hide the play again button when game starts
     obstacleInterval = setInterval(createObstacle, 1000);
     speedInterval = setInterval(() => {
         obstacleSpeed += 0.5; // Increase speed every 20 seconds
@@ -143,6 +157,20 @@ function startGame() {
         barSpeed += 0.01; // Increase bar speed after 30 seconds
     }, 30000);
     requestAnimationFrame(draw);
+}
+
+function endGame(won) {
+    gameOver = true;
+    clearInterval(obstacleInterval);
+    clearInterval(speedInterval);
+    clearInterval(barSpeedInterval);
+    if (won) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(winningImage, canvas.width / 2 - 150, canvas.height / 2 - 150, 300, 300);
+        document.getElementById('playAgainButton').style.display = 'block';
+    } else {
+        document.getElementById('startButton').style.display = 'block'; // Show the start button on game over
+    }
 }
 
 canvas.addEventListener('mousemove', (event) => {
@@ -154,3 +182,4 @@ canvas.addEventListener('mousemove', (event) => {
 });
 
 document.getElementById('startButton').addEventListener('click', startGame);
+document.getElementById('playAgainButton').addEventListener('click', startGame);

@@ -21,12 +21,14 @@ const player = {
 let obstacles = [];
 let rareBalls = [];
 let score = 0;
+let highestScore = 0;
 let gameOver = true;
 let gameWon = false; // Track game won state
 let obstacleSpeed = 2; // Base speed of obstacles
 let risingBarHeight = 0;
 let barSpeed = 0.1; // Initial speed of the rising bar
 let collectedBalls = 0; // Number of rare balls collected
+let totalObstacles = 0; // Track total obstacles for rare ball spawning
 
 let obstacleInterval;
 let speedInterval;
@@ -44,8 +46,8 @@ function createObstacle() {
         color: getRandomColor()
     });
 
-    // Randomly create rare balls
-    if (Math.random() < 0.1) {
+    totalObstacles++;
+    if (totalObstacles % 6 === 0) {
         createRareBall();
     }
 }
@@ -123,6 +125,7 @@ function updateObstacles() {
 
         if (detectCollision(player, ball)) {
             collectedBalls++;
+            score += 10; // Add 10 points for each rare ball collected
             rareBalls.splice(index, 1);
 
             if (collectedBalls >= 3) {
@@ -184,6 +187,7 @@ function draw() {
         } else {
             context.drawImage(losingImage, canvas.width / 2 - 150, canvas.height / 2 - 150, 300, 300);
         }
+        document.getElementById('totalScore').innerText = `Total Score: ${score}`;
     }
 
     context.fillStyle = '#fff';
@@ -191,6 +195,7 @@ function draw() {
     context.fillText(`Score: ${score}`, 10, 30);
     context.fillText(`Lives: ${player.lives}`, 10, 60);
     context.fillText(`Balls collected: ${collectedBalls}/3`, canvas.width - 150, 30);
+    context.fillText(`Highest Score: ${highestScore}`, canvas.width - 150, 60);
 
     requestAnimationFrame(draw);
 }
@@ -207,6 +212,7 @@ function startGame() {
     risingBarHeight = 0;
     barSpeed = 0.1;
     collectedBalls = 0; // Reset collected balls
+    totalObstacles = 0; // Reset total obstacles count
     document.getElementById('startButton').style.display = 'none'; // Hide the start button when game starts
     document.getElementById('playAgainButton').style.display = 'none'; // Hide the play again button when game starts
     obstacleInterval = setInterval(createObstacle, 1000);
@@ -225,6 +231,9 @@ function endGame(won) {
     clearInterval(obstacleInterval);
     clearInterval(speedInterval);
     clearInterval(barSpeedInterval);
+    if (score > highestScore) {
+        highestScore = score; // Update highest score
+    }
     document.getElementById('playAgainButton').style.display = 'block'; // Show play again button
 }
 

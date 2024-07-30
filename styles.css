@@ -5,8 +5,24 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #000;
+    flex-direction: column;
 }
 
 canvas {
     border: 2px solid #fff;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    background-color: #4b0082;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #6a0dad;
 }

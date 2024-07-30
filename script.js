@@ -98,14 +98,11 @@ function drawRisingBar() {
     context.fillRect(0, canvas.height - risingBarHeight, canvas.width, risingBarHeight);
     risingBarHeight += barSpeed;
 
-    if (risingBarHeight > canvas.height - player.height) {
-        if (player.y + player.height > canvas.height - risingBarHeight) {
-            player.lives--;
-            risingBarHeight = 0; // Reset bar height on losing a life
-
-            if (player.lives === 0) {
-                endGame(false);
-            }
+    if (risingBarHeight > canvas.height - player.height && player.y + player.height > canvas.height - risingBarHeight) {
+        player.lives--;
+        risingBarHeight = 0; // Reset bar height on losing a life
+        if (player.lives === 0) {
+            endGame(false);
         }
     }
 }

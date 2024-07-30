@@ -2,7 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 
 const playerImage = new Image();
-playerImage.src = 'image/SimpleArt.svg'; // Ensure this path matches your project structure
+playerImage.src = 'https://i.imgur.com/NxDmSPB.png'; // Updated URL for the hosted image
 
 const player = {
     x: canvas.width / 2 - 25,

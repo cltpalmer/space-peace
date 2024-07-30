@@ -19,16 +19,20 @@ const player = {
 };
 
 let obstacles = [];
+let rareBalls = [];
 let score = 0;
 let gameOver = true;
 let gameWon = false; // Track game won state
 let obstacleSpeed = 2; // Base speed of obstacles
 let risingBarHeight = 0;
 let barSpeed = 0.1; // Initial speed of the rising bar
+let collectedBalls = 0; // Number of rare balls collected
 
 let obstacleInterval;
 let speedInterval;
 let barSpeedInterval;
+
+const emotions = ["peace", "calm", "serenity", "tranquility", "relaxation"];
 
 function createObstacle() {
     const size = Math.random() * 30 + 20;
@@ -38,6 +42,24 @@ function createObstacle() {
         size: size,
         speed: Math.random() * obstacleSpeed + 1,
         color: getRandomColor()
+    });
+
+    // Randomly create rare balls
+    if (Math.random() < 0.1) {
+        createRareBall();
+    }
+}
+
+function createRareBall() {
+    const size = Math.random() * 30 + 20;
+    const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+    rareBalls.push({
+        x: Math.random() * (canvas.width - size),
+        y: -size,
+        size: size,
+        speed: Math.random() * obstacleSpeed + 1,
+        color: '#FF3131',
+        emotion: emotion
     });
 }
 
@@ -60,6 +82,19 @@ function drawObstacles() {
     });
 }
 
+function drawRareBalls() {
+    rareBalls.forEach(ball => {
+        context.beginPath();
+        context.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2);
+        context.fillStyle = ball.color;
+        context.fill();
+        context.closePath();
+        context.fillStyle = '#fff';
+        context.font = '10px Arial';
+        context.fillText(ball.emotion, ball.x - ball.size / 2, ball.y);
+    });
+}
+
 function updateObstacles() {
     obstacles.forEach(obstacle => {
         obstacle.y += obstacle.speed;
@@ -78,13 +113,30 @@ function updateObstacles() {
             }
         }
     });
+
+    rareBalls.forEach((ball, index) => {
+        ball.y += ball.speed;
+
+        if (ball.y > canvas.height + ball.size) {
+            rareBalls.splice(index, 1);
+        }
+
+        if (detectCollision(player, ball)) {
+            collectedBalls++;
+            rareBalls.splice(index, 1);
+
+            if (collectedBalls >= 3) {
+                checkWin();
+            }
+        }
+    });
 }
 
-function detectCollision(player, obstacle) {
-    const distX = Math.abs(obstacle.x - player.x - player.width / 2);
-    const distY = Math.abs(obstacle.y - player.y - player.height / 2);
+function detectCollision(player, obj) {
+    const distX = Math.abs(obj.x - player.x - player.width / 2);
+    const distY = Math.abs(obj.y - player.y - player.height / 2);
 
-    if (distX > (player.width / 2 + obstacle.size) || distY > (player.height / 2 + obstacle.size)) {
+    if (distX > (player.width / 2 + obj.size) || distY > (player.height / 2 + obj.size)) {
         return false;
     }
 
@@ -94,7 +146,7 @@ function detectCollision(player, obstacle) {
 
     const dx = distX - player.width / 2;
     const dy = distY - player.height / 2;
-    return (dx * dx + dy * dy <= (obstacle.size * obstacle.size));
+    return (dx * dx + dy * dy <= (obj.size * obj.size));
 }
 
 function drawRisingBar() {
@@ -112,7 +164,7 @@ function drawRisingBar() {
 }
 
 function checkWin() {
-    if (player.y < risingBarHeight) {
+    if (player.y < risingBarHeight && collectedBalls >= 3) {
         endGame(true);
     }
 }
@@ -123,9 +175,9 @@ function draw() {
     if (!gameOver) {
         drawPlayer();
         drawObstacles();
+        drawRareBalls();
         drawRisingBar();
         updateObstacles();
-        checkWin();
     } else {
         if (gameWon) {
             context.drawImage(winningImage, canvas.width / 2 - 150, canvas.height / 2 - 150, 300, 300);
@@ -138,6 +190,7 @@ function draw() {
     context.font = '20px Arial';
     context.fillText(`Score: ${score}`, 10, 30);
     context.fillText(`Lives: ${player.lives}`, 10, 60);
+    context.fillText(`Balls collected: ${collectedBalls}/3`, canvas.width - 150, 30);
 
     requestAnimationFrame(draw);
 }
@@ -147,10 +200,13 @@ function startGame() {
     gameWon = false; // Reset game won state
     score = 0;
     player.lives = 3;
+    player.y = canvas.height - 150; // Reset player position
     obstacles = [];
+    rareBalls = [];
     obstacleSpeed = 2;
     risingBarHeight = 0;
     barSpeed = 0.1;
+    collectedBalls = 0; // Reset collected balls
     document.getElementById('startButton').style.display = 'none'; // Hide the start button when game starts
     document.getElementById('playAgainButton').style.display = 'none'; // Hide the play again button when game starts
     obstacleInterval = setInterval(createObstacle, 1000);

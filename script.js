@@ -16,6 +16,8 @@ let obstacles = [];
 let score = 0;
 let gameOver = true;
 let obstacleSpeed = 2; // Base speed of obstacles
+let risingBarHeight = 0;
+let barSpeed = 0.1; // Initial speed of the rising bar
 
 function createObstacle() {
     const size = Math.random() * 30 + 20;
@@ -63,6 +65,9 @@ function updateObstacles() {
             if (player.lives === 0) {
                 gameOver = true;
                 document.getElementById('startButton').style.display = 'block'; // Show the start button on game over
+                clearInterval(obstacleInterval);
+                clearInterval(speedInterval);
+                clearInterval(barSpeedInterval);
             }
         }
     });
@@ -85,12 +90,27 @@ function detectCollision(player, obstacle) {
     return (dx * dx + dy * dy <= (obstacle.size * obstacle.size));
 }
 
+function drawRisingBar() {
+    context.fillStyle = '#aaff00';
+    context.fillRect(0, canvas.height - risingBarHeight, canvas.width, risingBarHeight);
+    risingBarHeight += barSpeed;
+
+    if (risingBarHeight > canvas.height) {
+        gameOver = true;
+        document.getElementById('startButton').style.display = 'block'; // Show the start button on game over
+        clearInterval(obstacleInterval);
+        clearInterval(speedInterval);
+        clearInterval(barSpeedInterval);
+    }
+}
+
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!gameOver) {
         drawPlayer();
         drawObstacles();
+        drawRisingBar();
         updateObstacles();
     } else {
         context.fillStyle = '#fff';
@@ -112,11 +132,16 @@ function startGame() {
     player.lives = 3;
     obstacles = [];
     obstacleSpeed = 2;
+    risingBarHeight = 0;
+    barSpeed = 0.1;
     document.getElementById('startButton').style.display = 'none'; // Hide the start button when game starts
-    setInterval(createObstacle, 1000);
-    setInterval(() => {
+    obstacleInterval = setInterval(createObstacle, 1000);
+    speedInterval = setInterval(() => {
         obstacleSpeed += 0.5; // Increase speed every 20 seconds
     }, 20000);
+    barSpeedInterval = setInterval(() => {
+        barSpeed += 0.01; // Increase bar speed after 30 seconds
+    }, 30000);
     requestAnimationFrame(draw);
 }
 

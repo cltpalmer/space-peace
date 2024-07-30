@@ -17,12 +17,14 @@ button {
     font-size: 20px;
     margin-bottom: 20px;
     cursor: pointer;
-    background-color: #4b0082;
+    background-color: #A883F9;
     color: #fff;
     border: none;
     border-radius: 5px;
+    font-family: 'Montserrat', sans-serif;
+    text-transform: lowercase;
 }
 
 button:hover {
-    background-color: #6a0dad;
+    background-color: #9370db;
 }

@@ -6,6 +6,7 @@ body {
     height: 100vh;
     background-color: #000;
     flex-direction: column;
+    position: relative;
 }
 
 canvas {
@@ -15,7 +16,6 @@ canvas {
 button {
     padding: 10px 20px;
     font-size: 20px;
-    margin-bottom: 20px;
     cursor: pointer;
     background-color: #A883F9;
     color: #fff;
@@ -24,7 +24,16 @@ button {
     font-family: 'Montserrat', sans-serif;
     text-transform: lowercase;
     position: absolute;
+}
+
+#startButton {
     top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#playAgainButton {
+    top: 70%;
     left: 50%;
     transform: translate(-50%, -50%);
 }

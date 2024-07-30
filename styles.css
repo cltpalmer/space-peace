@@ -33,9 +33,19 @@ button {
 }
 
 #playAgainButton {
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#totalScore {
     top: 70%;
     left: 50%;
     transform: translate(-50%, -50%);
+    position: absolute;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
 }
 
 button:hover {
